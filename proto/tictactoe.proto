@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package tictactoe;
+
+service PlayerService {
+    rpc DoMovement (PlayerRequest) returns (PlayerResponse);
+    rpc CreateRoom (Empty) returns (CreateRoomResponse);
+    rpc WatchRoomStream(WatchRoomRequest) returns (stream PlayerResponse);
+    rpc HasWinner(HasWinnerRequest) returns (HasWinnerResponse);
+}
+
+message Empty { }
+
+message PlayerRequest {
+    string roomId = 1;
+    string shape = 2;
+    int32 x = 3;
+    int32 y = 4;
+}
+message JoinRoomRequest {
+    string roomId = 1;
+    int32 spacing = 2;
+}
+
+message WatchRoomRequest {
+    string roomId = 1;
+    int32 spacing = 2;
+}
+message CreateRoomResponse {
+    string roomId = 1;
+}
+message PlayerResponse {
+    string message = 1;
+}
+
+message HasWinnerRequest {
+    string roomId = 1;
+}
+
+message HasWinnerResponse {
+    string shapeWinner = 1;
+    bool hasWinner = 2;
+}
+

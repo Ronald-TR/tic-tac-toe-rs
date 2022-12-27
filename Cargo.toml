@@ -1,0 +1,45 @@
+[package]
+name = "tic-tac-toe"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+members = [ "algorithm" ]
+
+[dependencies]
+lazy_static = "1.4.0"
+structopt = { version = "0.3", default-features = false }
+algorithm = { path = "./algorithm" }
+tui = "0.18"
+crossterm = "0.23"
+tonic = "0.7"
+prost = "0.10"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "macros", "sync", "time", "process"] }
+async-stream = "0.2"
+tokio-stream = { version = "0.1", features = ["net"] }
+anyhow = "1.0.68"
+unicode-segmentation = "1.2"
+unicode-width = "0.1"
+dialoguer = "0.10.2"
+futures = "0.3.25"
+
+[dependencies.uuid]
+version = "1.1.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
+
+[build-dependencies]
+tonic-build = "0.7"
+
+[[bin]]
+name = "server"
+path = "src/server/main.rs"
+
+[[bin]]
+name = "client"
+path = "src/client/main.rs"
