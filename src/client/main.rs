@@ -23,6 +23,7 @@ extern crate lazy_static;
 
 enum InputMode {
     Popup,
+    Warn,
     Editing,
 }
 
@@ -150,6 +151,12 @@ fn run_app<B: Backend>(
                     }
                     _ => {}
                 },
+                InputMode::Warn => match key.code {
+                    KeyCode::Esc => {
+                        app.input_mode = InputMode::Editing;
+                    }
+                    _ => {}
+                },
                 InputMode::Editing => match key.code {
                     KeyCode::Enter => {
                         app.command = app.input.drain(..).collect();
@@ -165,6 +172,10 @@ fn run_app<B: Backend>(
                         if result.contains("winner") {
                             app.winner_message = result;
                             app.input_mode = InputMode::Popup;
+                        }
+                        else if result.contains("Invalid") {
+                            app.winner_message = result;
+                            app.input_mode = InputMode::Warn;
                         }
                     }
                     KeyCode::Char(c) => {
@@ -240,6 +251,22 @@ fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
             let content = Paragraph::new(Text::raw(format!(
                 "{}\n{}",
                 app.winner_message, "press Esc to exit"
+            )))
+            .style(Style::default().fg(Color::DarkGray));
+            f.render_widget(Clear, area); //this clears out the background
+            f.render_widget(block, area);
+            f.render_widget(content, content_area);
+        }
+        InputMode::Warn => {
+            let block = Block::default()
+                .title("Invalid movement")
+                .borders(Borders::ALL)
+                .style(Style::default().bg(Color::LightYellow).fg(Color::Black));
+            let area = centered_rect(45, 20, f.size());
+            let content_area = centered_rect(40, 10, f.size());
+            let content = Paragraph::new(Text::raw(format!(
+                "{}\n{}",
+                app.winner_message, "press Esc to continue playing"
             )))
             .style(Style::default().fg(Color::DarkGray));
             f.render_widget(Clear, area); //this clears out the background

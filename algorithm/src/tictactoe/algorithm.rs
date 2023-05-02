@@ -1,5 +1,6 @@
 
 use crate::tictactoe::enums::PlayerShape;
+use anyhow::{Result, bail};
 
 pub struct TTTBoard {
     matrix: [[i8; 3]; 3],
@@ -30,6 +31,14 @@ impl TTTBoard {
 
     pub fn insert(&mut self, x: usize, y: usize, player: &PlayerShape) {
         self.matrix[x][y] = player.to_integer();
+    }
+    
+    pub fn safe_insert(&mut self, x: usize, y: usize, player: &PlayerShape) -> Result<()> {
+        if self.matrix[x][y] != 0 {
+            bail!("Invalid movement, cell already filled");
+        }
+        self.matrix[x][y] = player.to_integer();
+        Ok(())
     }
 
     pub fn find_winner(&self) -> Option<PlayerShape> {

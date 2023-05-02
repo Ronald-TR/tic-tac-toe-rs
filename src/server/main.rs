@@ -37,9 +37,13 @@ impl PlayerService for MyPlayer {
         let mut map = HASHMAP.lock().await;
         let board = map.get_mut(&params.room_id).unwrap();
         let player = PlayerShape::from_str(&params.shape).unwrap();
-        board.insert(params.x as usize, params.y as usize, &player);
-        let winner = board.find_winner();
+        let result = board.safe_insert(params.x as usize, params.y as usize, &player);
         let mut message = String::from("Movement being done!! The game continues...");
+        if result.is_err() {
+            message = result.unwrap_err().to_string();
+
+        }
+        let winner = board.find_winner();
         if winner.is_some() {
             message = format!(
                 "We have a winner! {} is the winner",
