@@ -1,9 +1,11 @@
 use algorithm::proto::{player_service_client::PlayerServiceClient, PlayerRequest, WatchRoomRequest, Empty, HasWinnerRequest, HasWinnerResponse};
 use anyhow::Result;
 use tokio_stream::StreamExt;
+use std::env;
 use crate::{APP, BOARD};
 
 pub async fn do_movement(room_id: String, command: String, shape: String) -> Result<String> {
+    let host = env::var("SERVER_HOST").unwrap_or_else(|_| "http://[::1]:50051".to_string());
     if command.trim().is_empty() {
         return Ok("empty movement".to_string());
     }
@@ -11,7 +13,7 @@ pub async fn do_movement(room_id: String, command: String, shape: String) -> Res
     if chordinates.len() == 0 {
         return Ok("empty movement".to_string());
     }
-    let mut client = PlayerServiceClient::connect("http://[::1]:50051")
+    let mut client = PlayerServiceClient::connect(host)
         .await
         .unwrap();
 
@@ -30,6 +32,7 @@ pub async fn do_movement(room_id: String, command: String, shape: String) -> Res
 }
 
 pub async fn create_or_join_room() -> Result<()> {
+    let host = env::var("SERVER_HOST").unwrap_or_else(|_| "http://[::1]:50051".to_string());
     let mut app = APP.lock().await;
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 2 {
@@ -46,7 +49,7 @@ pub async fn create_or_join_room() -> Result<()> {
 
         return Ok(());
     }
-    let mut client = PlayerServiceClient::connect("http://[::1]:50051")
+    let mut client = PlayerServiceClient::connect(host)
         .await
         .unwrap();
 
@@ -59,7 +62,8 @@ pub async fn create_or_join_room() -> Result<()> {
 }
 
 pub async fn loop_board_state(room_id: String) -> Result<HasWinnerResponse> {
-    let mut client = PlayerServiceClient::connect("http://[::1]:50051")
+    let host = env::var("SERVER_HOST").unwrap_or_else(|_| "http://[::1]:50051".to_string());
+    let mut client = PlayerServiceClient::connect(host)
         .await
         .unwrap();
 
